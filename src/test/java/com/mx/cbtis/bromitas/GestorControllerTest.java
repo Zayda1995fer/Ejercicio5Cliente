@@ -8,6 +8,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +35,23 @@ public class GestorControllerTest {
     @Autowired
     private GestorController controller;
 
+    // PRACTICA 3: es el mismo RestTemplate que usa el controlador (bean de RestClientConfig).
+    // Antes se creaba uno nuevo aqui y el controlador usaba otro, asi que el mock nunca interceptaba
+    // y las pruebas dependian de que el API estuviera encendida en localhost:8081.
+    @Autowired
+    private RestTemplate restTemplate;
+
     private MockRestServiceServer mockServer;
 
     @BeforeEach
     public void setUp() {
-        // Al crear RestTemplate dentro del controlador de forma manual,
-        // vinculamos MockRestServiceServer a una nueva instancia para interceptar peticiones.
-        RestTemplate restTemplate = new RestTemplate();
         mockServer = MockRestServiceServer.createServer(restTemplate);
+    }
+
+    @AfterEach
+    public void verificarLlamadas() {
+        // Falla si una peticion esperada al API no se realizo
+        mockServer.verify();
     }
 
     @Test

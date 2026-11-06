@@ -44,6 +44,14 @@ function validarLogin(){
 					localStorage.setItem("usuario", JSON.stringify(data));
 					window.location.href = 'inicio';
 				}
+			},
+			// PRACTICA 3 (defecto AUT-F04 de la practica 2): si el backend falla (500, sin conexion)
+			// antes no se avisaba nada al usuario
+			error: function(xhr){
+				console.error("Error al verificar el login: " + xhr.status);
+				var myToast = document.querySelector('#alerta6');
+				var toast = new bootstrap.Toast(myToast);
+				toast.show();
 			}
 		});
 	}

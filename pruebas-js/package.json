@@ -1,0 +1,44 @@
+{
+  "name": "pruebas-frontend-ejercicio5cliente",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pruebas automaticas del frontend (Ejercicio5Cliente): login.js e inicio.js",
+  "scripts": {
+    "test": "jest --verbose",
+    "test:cobertura": "jest --verbose --coverage"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "rootDir": "..",
+    "roots": [
+      "<rootDir>/pruebas-js/tests"
+    ],
+    "collectCoverageFrom": [
+      "src/main/resources/static/js/login.js",
+      "src/main/resources/static/js/inicio.js"
+    ],
+    "coverageDirectory": "<rootDir>/pruebas-js/coverage",
+    "coverageReporters": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 100,
+        "branches": 100,
+        "functions": 100,
+        "lines": 100
+      }
+    }
+  },
+  "devDependencies": {
+    "istanbul-lib-instrument": "^6.0.3",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2"
+  },
+  "overrides": {
+    "glob": "^14.0.2",
+    "minimatch": "^11.0.1"
+  }
+}

@@ -1,0 +1,12 @@
+PRUEBAS AUTOMATICAS DEL FRONTEND (Practica 2 y 3)
+=================================================
+Requisito: Node.js (version 18 o mas reciente) -> https://nodejs.org (version LTS)
+
+Comandos (en la terminal, dentro de Ejercicio5Cliente\pruebas-js):
+   npm ci                      (solo la primera vez, instala dependencias)
+   npm test                    (ejecuta las pruebas)
+   npm run test:cobertura      (pruebas + reporte de cobertura, exige 100%)
+
+El reporte de cobertura queda en: pruebas-js\coverage\index.html
+No se necesita tener el backend ni la base de datos encendidos.
+Resultado esperado (Practica 3): 20 pruebas aprobadas, 100% de cobertura en login.js e inicio.js.
