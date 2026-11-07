@@ -7,7 +7,7 @@
 //   - (Analisis Sonar)  credencial "Secret text" con ID "sonar-token" y SonarQube en SONAR_HOST_URL
 //   - (Escaneo Trivy)   Docker Desktop encendido en el agente
 // Las pruebas simulan el API (MockRestServiceServer y $.ajax de Jest): NO se necesita el backend encendido.
-def run(String cmd) {
+def ejecutar(String cmd) {
     if (isUnix()) { sh cmd } else { bat cmd }
 }
 
@@ -17,7 +17,7 @@ def trivy(String opciones) {
     String ws = isUnix() ? '$WORKSPACE' : '%WORKSPACE%'
     // Se monta el repositorio local de Maven para que Trivy resuelva tambien las dependencias transitivas (Tomcat, Jackson...)
     String m2 = isUnix() ? '$HOME/.m2' : '%USERPROFILE%\\.m2'
-    run "docker run --rm -v \"${ws}\":/src -v \"${m2}\":/root/.m2 -v trivy-cache:/root/.cache aquasec/trivy:0.58.1 fs --no-progress --include-dev-deps --skip-dirs target --skip-dirs pruebas-js/node_modules --skip-dirs pruebas-js/coverage ${opciones} /src"
+    ejecutar "docker run --rm -v \"${ws}\":/src -v \"${m2}\":/root/.m2 -v trivy-cache:/root/.cache aquasec/trivy:0.58.1 fs --no-progress --include-dev-deps --skip-dirs target --skip-dirs pruebas-js/node_modules --skip-dirs pruebas-js/coverage ${opciones} /src"
 }
 
 pipeline {
@@ -38,21 +38,21 @@ pipeline {
     stages {
         stage('Verificar versiones') {
             steps {
-                run 'java -version'
-                run 'mvn -v'
+                ejecutar 'java -version'
+                ejecutar 'mvn -v'
             }
         }
 
         stage('Compilar') {
             steps {
-                run 'mvn -B clean compile'
+                ejecutar 'mvn -B clean compile'
             }
         }
 
         stage('Pruebas Java y cobertura') {
             steps {
                 // verify = Surefire (pruebas) + JaCoCo report + JaCoCo check (100% lineas y ramas)
-                run 'mvn -B verify'
+                ejecutar 'mvn -B verify'
             }
             post {
                 always {
@@ -66,10 +66,10 @@ pipeline {
             when { expression { params.PRUEBAS_JS } }
             steps {
                 dir('pruebas-js') {
-                    run 'node -v'
-                    run 'npm ci'
+                    ejecutar 'node -v'
+                    ejecutar 'npm ci'
                     // coverageThreshold en package.json: falla si login.js o inicio.js bajan del 100%
-                    run 'npm run test:cobertura'
+                    ejecutar 'npm run test:cobertura'
                 }
             }
             post {
@@ -84,7 +84,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     // sonar.exclusions: no se analiza target/, librerias de terceros (bootstrap/jquery/popper) ni lo generado por npm; el codigo propio si se analiza
-                    run "mvn -B sonar:sonar -Dsonar.host.url=${params.SONAR_HOST_URL} -Dsonar.projectKey=Ejercicio5Cliente -Dsonar.exclusions=**/target/**,**/static/js/bootstrap*,**/static/js/jquery*,**/static/js/popper*,**/static/css/bootstrap*,pruebas-js/node_modules/**,pruebas-js/coverage/** -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml -Dsonar.javascript.lcov.reportPaths=pruebas-js/coverage/lcov.info -Dsonar.qualitygate.wait=true"
+                    ejecutar "mvn -B sonar:sonar -Dsonar.host.url=${params.SONAR_HOST_URL} -Dsonar.projectKey=Ejercicio5Cliente -Dsonar.exclusions=**/target/**,**/static/js/bootstrap*,**/static/js/jquery*,**/static/js/popper*,**/static/css/bootstrap*,pruebas-js/node_modules/**,pruebas-js/coverage/** -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml -Dsonar.javascript.lcov.reportPaths=pruebas-js/coverage/lcov.info -Dsonar.qualitygate.wait=true"
                 }
             }
         }
@@ -105,7 +105,7 @@ pipeline {
 
         stage('Empaquetar') {
             steps {
-                run 'mvn -B package -DskipTests -Djacoco.skip=true'
+                ejecutar 'mvn -B package -DskipTests -Djacoco.skip=true'
             }
         }
     }
